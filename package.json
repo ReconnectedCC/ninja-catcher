@@ -54,7 +54,7 @@
     "eslint": "^7.27.0",
     "magic-string": "^0.26.3",
     "monaco-editor": "^0.34.0",
-    "postcss": "^8.4.16",
+    "postcss": "^8.5.1",
     "postcss-selector-parser": "^6.0.2",
     "preact": "^10.4.5",
     "requirejs": "^2.3.6",
