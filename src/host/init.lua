@@ -132,7 +132,7 @@ if not fs.isDir(sync_dir) then error(("%q is not a directory"):format(sync_dir),
 table.insert(capabilities, "file:host")
 
 -- Let's try to connect to the remote server
-local url = ("%s://ninja.its-em.ma/connect?id=%s&capabilities=%s"):format(
+local url = ("%s:/localhost:8080/connect?id=%s&capabilities=%s"):format(
   args.http and "ws" or "wss", token, table.concat(capabilities, ","))
 local remote, err = http.websocket(url)
 if not remote then error("Cannot connect to ninja-catcher server: " .. err, 0) end
