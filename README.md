@@ -3,7 +3,7 @@
 A web interface for ComputerCraft computers
 
 ## Getting started
- - Visit https://ninja.its-em.ma/
+ - Visit https://ninja.reconnected.cc/
  - Follow the instructions there
  - One can run `ninja edit <filename>` to edit a file remotely.
 
