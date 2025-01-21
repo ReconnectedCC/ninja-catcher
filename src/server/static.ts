@@ -13,9 +13,16 @@ const mimeTypes: { [key: string]: string | undefined } = {
 };
 
 export const handle = (dir: string) => (requestUrl: UrlWithParsedQuery, _request: http.IncomingMessage, response: http.ServerResponse) => {
-  const filePath = path.join(dir, !requestUrl.pathname || requestUrl.pathname === "/"
+  let filePath = path.join(dir, !requestUrl.pathname || requestUrl.pathname === "/"
     ? "index.html"
     : requestUrl.pathname);
+
+  filePath = path.resolve(filePath);
+  if (!filePath.startsWith(path.resolve(dir))) {
+    response.writeHead(403, { "Content-Type": "text/html" });
+    response.end("Forbidden", "utf-8");
+    return;
+  }
 
   const extname = String(path.extname(filePath)).toLowerCase();
   const mime = mimeTypes[extname];
