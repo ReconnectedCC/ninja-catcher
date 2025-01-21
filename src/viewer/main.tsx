@@ -43,7 +43,7 @@ export class Main extends Component<MainProps, MainState> {
 
       terminalFont: termFont,
 
-      darkMode: false,
+      darkMode: true,
       terminalBorder: false,
     };
 
