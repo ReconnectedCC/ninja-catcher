@@ -1,0 +1,1 @@
+This excerpt of code has been adapted from JackMacWindows' [vscode-computercraft](https://github.com/MCJack123/vscode-computercraft/) under the MIT License.

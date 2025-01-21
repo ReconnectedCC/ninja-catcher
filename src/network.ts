@@ -1,5 +1,6 @@
 import type { Fragment } from "./diff.js";
 
+
 /**
  * This represents the capabilities a client has. The server can be thought of a
  * monolithic entity which has all the capabilities its clients provide.
@@ -193,6 +194,7 @@ export type PacketFileReqeust = {
 
 // TODO: Add docs back
 export const enum FileActionFlags {
+  None = 0x0,
   ReadOnly = 0x1,
   New = 0x8,
 

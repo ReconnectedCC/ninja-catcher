@@ -1,7 +1,9 @@
-import type * as monaco from "../../editor/lua";
+import * as monaco from "../../editor/lua";
 import { Component, h } from "preact";
 import type { Settings } from "../settings";
 import { editorView } from "../styles.css";
+import { L4RCAutocomplete } from "./lsp/autocomplete";
+import L4RCApiData from "./lsp/ApiData";
 
 let monacoVal: typeof monaco | null = null;
 
@@ -24,6 +26,8 @@ let unique = 0;
 
 const modelFactory = (m: typeof monaco, out: {}, contents: string, name: string, setup: Setup): Model => {
   unique++; // We keep a unique id to ensure the Uri is not repeated.
+  const l4RCApiData = new L4RCApiData('/');
+  m.languages.registerCompletionItemProvider({ language: "lua", scheme: "file" }, new L4RCAutocomplete (l4RCApiData));
   const text = m.editor.createModel(contents, undefined, m.Uri.file(`f${unique.toString(16)}/${name}`));
 
   text.updateOptions({ trimAutoWhitespace: true });
