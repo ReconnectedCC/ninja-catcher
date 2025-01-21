@@ -10,7 +10,7 @@ import type { OutputChunk, OutputOptions, Plugin, RollupOptions } from "rollup";
 import license from "rollup-plugin-license";
 import livereload from 'rollup-plugin-livereload';
 import postcss from "rollup-plugin-postcss";
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 
 const production = !process.env.ROLLUP_WATCH;
 
