@@ -49,7 +49,7 @@
     "@types/diff": "^7.0.0",
     "@types/ws": "^8.2.0",
     "eslint": "^9.18.0",
-    "magic-string": "^0.26.3",
+    "magic-string": "^0.30.17",
     "monaco-editor": "^0.34.0",
     "postcss": "^8.5.1",
     "postcss-selector-parser": "^7.0.0",
