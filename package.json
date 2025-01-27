@@ -51,7 +51,7 @@
     "@rollup/plugin-url": "^7.0.0",
     "@squid-dev/cc-web-term": "^1.0.0",
     "@types/diff": "^7.0.0",
-    "@types/ws": "^8.2.0",
+    "@types/ws": "^8.5.14",
     "eslint": "^9.18.0",
     "magic-string": "^0.30.17",
     "monaco-editor": "^0.34.0",
