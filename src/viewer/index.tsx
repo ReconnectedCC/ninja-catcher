@@ -4,8 +4,6 @@ import { Main } from "./main";
 import type * as monaco from "monaco-editor";
 
 {
-  requirejs.config({ paths: { vs: "__monaco__/min/vs" } });
-
   (window as any).MonacoEnvironment = { // eslint-disable-line @typescript-eslint/no-explicit-any
     getWorkerUrl: (_workerId: string, _label: string) =>
       `data:text/javascript;charset=utf-8,${encodeURIComponent(`

@@ -426,4 +426,19 @@ export class Computer extends Component<ComputerProps, ComputerState> implements
   public reboot(): void {
     console.warn("Reboot does nothing");
   }
+
+  public transferFiles(files: Array<{ name: string; contents: ArrayBuffer }>): void {
+    const decoder = new TextDecoder();
+    this.props.connection.send(encodePacket({
+      packet: PacketCode.FileAction,
+      id: 0,
+      actions: files.map(({ name, contents }) => ({
+        file: name,
+        checksum: 0,
+        action: FileAction.Replace as const,
+        flags: FileActionFlags.Open,
+        contents: decoder.decode(contents),
+      })),
+    }));
+  }
 }

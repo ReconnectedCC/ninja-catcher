@@ -13,6 +13,7 @@ import postcss from "rollup-plugin-postcss";
 import terser from '@rollup/plugin-terser';
 
 const production = !process.env.ROLLUP_WATCH;
+const monacoUrl = "https://cdn.jsdelivr.net/npm/monaco-editor@0.34.0";
 
 const makeTemplate = (filename: string) => async (options?: RollupHtmlTemplateOptions): Promise<string> => {
   if (!options) throw new Error("Must specify RollupHtmlTemplateOptions");
@@ -28,7 +29,9 @@ const makeTemplate = (filename: string) => async (options?: RollupHtmlTemplateOp
     .map(({ fileName }) => `<link href="${publicPath}${fileName}" rel="stylesheet"${makeHtmlAttributes(attributes.link)}>`)
     .join("\n");
 
-  const templateFields: { [filed: string]: unknown } = { scripts, links };
+  const requireConfig = `<script>var require = { paths: { vs: "${monacoUrl}/min/vs" } };</script>`;
+
+  const templateFields: { [filed: string]: unknown } = { scripts, links, requireConfig };
 
   const template = await fs.readFile(filename, { encoding: "utf-8" });
   return template.replace(/\$\{([^}]+)\}/g, (_, name) => {
@@ -81,7 +84,7 @@ const site = (): RollupOptions => {
     plugins: [
       replace({
         preventAssignment: true,
-        __monaco__: "https://cdn.jsdelivr.net/npm/monaco-editor@0.34.0",
+        __monaco__: monacoUrl,
       }),
 
       postcss({
@@ -122,8 +125,11 @@ const site = (): RollupOptions => {
       {
         name: "ninja-catcher",
         async writeBundle() {
+          await fs.mkdir(`${outDir}/data`, { recursive: true });
           await Promise.all([
             fs.copyFile("node_modules/requirejs/require.js", `${outDir}/require.js`),
+            fs.copyFile("data/classes.json", `${outDir}/data/classes.json`),
+            fs.copyFile("data/defines.json", `${outDir}/data/defines.json`),
           ]);
         }
       },
@@ -149,6 +155,13 @@ const server = (): RollupOptions => {
       sourcemap: true,
       interop: "default",
       externalLiveBindings: false,
+    },
+
+    // Suppress `this` rewritten to `undefined` warnings from @opentelemetry/api's
+    // ESM build, which uses CJS-style helpers (e.g. `this && this.__extends`).
+    onwarn(warning, warn) {
+      if (warning.code === "THIS_IS_UNDEFINED" && warning.id?.includes("@opentelemetry")) return;
+      warn(warning);
     },
 
     plugins: [

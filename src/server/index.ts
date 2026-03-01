@@ -1,6 +1,5 @@
 import * as http from "http";
 import * as process from "process";
-import * as url from "url";
 import * as WebSocket from "ws";
 import { register as metrics, Counter, Gauge, collectDefaultMetrics } from "prom-client";
 
@@ -67,8 +66,9 @@ const connectionUpdate = (connection: Connection) => {
 
 const server = http.createServer();
 const connections = new Map<Token, Connection>();
+const baseUrl = `http://${process.env.npm_package_config_server || "localhost"}`;
 
-let defaultHandler: (url: url.UrlWithParsedQuery, request: http.IncomingMessage, response: http.ServerResponse) => void;
+let defaultHandler: (url: URL, request: http.IncomingMessage, response: http.ServerResponse) => void;
 // if (process.env.NODE_ENV === "production") {
 //   defaultHandler = (_url, _request, response) => {
 //     response.writeHead(404, { "Content-Type": "text/html" });
@@ -79,8 +79,8 @@ defaultHandler = handle("_site");
 // }
 
 server.on("request", (request: http.IncomingMessage, response: http.ServerResponse) => {
-  const requestUrl = url.parse(request.url || "", true);
-  if (requestUrl.path === "/metrics") {
+  const requestUrl = new URL(request.url || "", baseUrl);
+  if (requestUrl.pathname === "/metrics") {
     metrics.metrics().then(result => {
       response.writeHead(200, { "Content-Type": metrics.contentType });
       response.end(result, "utf-8");
@@ -121,8 +121,7 @@ const wss = new WebSocket.WebSocketServer({
   verifyClient: (info, cb): void => {
     if (!info.req.url) return cb(false, HTTPCodes.BadRequest, "Cannot determine URL");
 
-    const requestUrl = url.parse(info.req.url, true);
-    if (!requestUrl || !requestUrl.pathname) return cb(false, HTTPCodes.BadRequest, "Cannot parse URL");
+    const requestUrl = new URL(info.req.url, baseUrl);
 
     switch (requestUrl.pathname.replace(/\/+$/, "")) {
       case "/view":
@@ -132,12 +131,12 @@ const wss = new WebSocket.WebSocketServer({
       case "/connect": {
 
         // Verify our token
-        const token = requestUrl.query.id;
+        const token = requestUrl.searchParams.get("id");
         if (!checkToken(token)) return cb(false, HTTPCodes.BadRequest, "Expected session token");
 
         // Verify our capability set
-        const capabilityStr = requestUrl.query.capabilities;
-        if (!capabilityStr || typeof capabilityStr !== "string") {
+        const capabilityStr = requestUrl.searchParams.get("capabilities");
+        if (!capabilityStr) {
           return cb(false, HTTPCodes.BadRequest, "Expected capabilities");
         }
 
@@ -166,8 +165,7 @@ const wss = new WebSocket.WebSocketServer({
 });
 
 wss.on("connection", (ws: SessionWebSocket, req: http.IncomingMessage) => {
-  const requestUrl = url.parse(req.url || "", true);
-  if (!requestUrl || !requestUrl.query || !requestUrl.pathname) return ws.close(WebsocketCodes.UnsupportedData);
+  const requestUrl = new URL(req.url || "", baseUrl);
 
   totalConnections.inc();
 
@@ -177,11 +175,12 @@ wss.on("connection", (ws: SessionWebSocket, req: http.IncomingMessage) => {
       return ws.close(WebsocketCodes.UnsupportedData);
 
     case "/connect": {
-      const token = requestUrl.query.id;
+      const token = requestUrl.searchParams.get("id");
       if (!checkToken(token)) return ws.close(WebsocketCodes.UnsupportedData);
 
-      if (typeof requestUrl.query.capabilities !== "string") return ws.close(WebsocketCodes.UnsupportedData);
-      const capabilities = new Set(requestUrl.query.capabilities.split(",")) as Set<Capability>;
+      const capabilityStr = requestUrl.searchParams.get("capabilities");
+      if (!capabilityStr) return ws.close(WebsocketCodes.UnsupportedData);
+      const capabilities = new Set(capabilityStr.split(",")) as Set<Capability>;
 
       let conn = connections.get(token);
       if (conn === undefined) {

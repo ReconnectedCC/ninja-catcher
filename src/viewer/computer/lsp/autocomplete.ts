@@ -2,7 +2,6 @@
 import * as monaco from "../../../editor/lua";
 import L4RCApiData from "./ApiData";
 import { getLastMatch, keys, assign } from "./utils";
-import * as vscode from "vscode";
 
 const wordsRegex = /([\w\[\]]+\.[\w\[\]\.]*)/g
 
@@ -43,18 +42,21 @@ export class L4RCAutocomplete implements monaco.languages.CompletionItemProvider
     private toCompletionItem(type: L4RCType, key: string): monaco.languages.CompletionItem {
         const { doc, name, mode } = type
 
-        let completionItem = assign(new vscode.CompletionItem(key), {
+        let completionItem: monaco.languages.CompletionItem = {
+            label: key,
+            insertText: key,
+            range: undefined!,
             detail: "(property) " + key + ": " + type.type,
-            documentation: new vscode.MarkdownString(["**"+name+"**", doc, mode].filter(Boolean).join("\n\n")),
+            documentation: { value: ["**"+name+"**", doc, mode].filter(Boolean).join("\n\n") },
             kind: monaco.languages.CompletionItemKind.Property,
             filterText: key + " " + name
-        })
+        }
 
         if (type.type === "function") {
             assign(completionItem, {
                 detail: "(function) " + name + "("+ (type.args ? Object.keys(type.args).join(", ") : "") + "): " + type.returns,
                 kind: monaco.languages.CompletionItemKind.Function,
-                documentation: new vscode.MarkdownString([doc, mode].filter(Boolean).join("\n\n")),
+                documentation: { value: [doc, mode].filter(Boolean).join("\n\n") },
             })
         }
         

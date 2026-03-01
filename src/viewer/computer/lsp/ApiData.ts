@@ -1,5 +1,3 @@
-import * as fs from "fs"
-
 const brackets = /\[.*\]/g
 
 export interface L4RCType {
@@ -17,10 +15,18 @@ export default class L4RCApiData {
     private classes: L4RCTypeMap
     private defines: L4RCTypeMap
 
-    constructor(private dataPath: string) {
+    constructor(classes: L4RCTypeMap, defines: L4RCTypeMap) {
         this.classes = {};
         this.defines = {};
-        this.loadData(this.dataPath)
+        this.initData(classes, defines)
+    }
+
+    public static async load(dataPath: string): Promise<L4RCApiData> {
+        const [classes, defines] = await Promise.all([
+            fetch(dataPath + "/classes.json").then(r => r.json()),
+            fetch(dataPath + "/defines.json").then(r => r.json()),
+        ]);
+        return new L4RCApiData(classes, defines);
     }
 
     public findType(words: string[]): L4RCType {
@@ -88,10 +94,7 @@ export default class L4RCApiData {
         return type
     }
 
-    private loadData(dataPath: string) {
-        const classes = this.loadDataFile(dataPath + "/classes.json")
-        const defines = this.loadDataFile(dataPath + "/defines.json")
-
+    private initData(classes: L4RCTypeMap, defines: L4RCTypeMap) {
         // Add some additional autocomplete triggers (when typing on blank line or pressing ctrl-space)
         Object.keys(additionalTriggers).forEach(trigger => {
             let luaType = additionalTriggers[trigger]
@@ -107,11 +110,5 @@ export default class L4RCApiData {
             type: "define",
             properties: defines
         }
-    }
-
-    private loadDataFile(fileName: string): L4RCTypeMap {
-        const jsonStr = fs.readFileSync(fileName, "utf8")
-        const data = JSON.parse(jsonStr)
-        return data
     }
 }

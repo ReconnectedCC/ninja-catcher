@@ -1,18 +1,18 @@
 import * as fs from "fs";
 import type * as http from "http";
 import * as path from "path";
-import type { UrlWithParsedQuery } from "url";
 
 const mimeTypes: { [key: string]: string | undefined } = {
   ".html": "text/html",
   ".js": "text/javascript",
   ".css": "text/css",
+  ".json": "application/json",
   ".png": "image/png",
   ".jpg": "image/jpg",
   ".lua": "text/lua",
 };
 
-export const handle = (dir: string) => (requestUrl: UrlWithParsedQuery, _request: http.IncomingMessage, response: http.ServerResponse) => {
+export const handle = (dir: string) => (requestUrl: URL, _request: http.IncomingMessage, response: http.ServerResponse) => {
   let filePath = path.join(dir, !requestUrl.pathname || requestUrl.pathname === "/"
     ? "index.html"
     : requestUrl.pathname);
