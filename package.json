@@ -48,7 +48,7 @@
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-terser": "^0.1.0",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@rollup/plugin-url": "^7.0.0",
+    "@rollup/plugin-url": "^8.0.2",
     "@squid-dev/cc-web-term": "^2.0.1",
     "@types/diff": "^7.0.0",
     "@types/ws": "^8.18.0",
