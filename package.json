@@ -52,7 +52,7 @@
     "@squid-dev/cc-web-term": "^2.0.1",
     "@types/diff": "^7.0.0",
     "@types/ws": "^8.18.0",
-    "eslint": "^9.18.0",
+    "eslint": "^10.0.2",
     "magic-string": "^0.30.17",
     "monaco-editor": "^0.34.0",
     "postcss": "^8.5.1",
